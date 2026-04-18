@@ -50,6 +50,15 @@ export class AppComponent {
   ) {
     moment.locale('sv');
     registerLocaleData(sv);
+    this.loadAvailableDateRange();
+  }
+
+  private async loadAvailableDateRange() {
+    const url = 'https://api.scb.se/OV0104/v1/doris/sv/ssd/START/PR/PR0101/PR0101A/KPItotM';
+    const metadata = await lastValueFrom(this.http.get(url)) as any;
+    const tid = metadata.variables.find((v: any) => v.code === 'Tid');
+    this.minDate = moment(tid.values.at(0), 'YYYY[M]MM');
+    this.maxDate = moment(tid.values.at(-1), 'YYYY[M]MM');
   }
 
   public openDatepicker(event: Event, datepickerRef: MatDatepicker<Moment>) {
@@ -154,8 +163,8 @@ export class AppComponent {
       }
 
     };
-    const headers = { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' }
-    const request = this.http.post(url, body, { headers: headers });
+    const headers = { 'Content-Type': 'text/plain' }
+    const request = this.http.post(url, JSON.stringify(body), { headers: headers });
     const response = await lastValueFrom(request) as any;
 
     return response;

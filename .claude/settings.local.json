@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -sS -X POST 'https://api.scb.se/OV0104/v1/doris/sv/ssd/START/PR/PR0101/PR0101A/KPItotM' -H 'Content-Type: application/json' --data-raw '{\"query\":[{\"code\":\"ContentsCode\",\"selection\":{\"filter\":\"item\",\"values\":[\"000004VU\"]}},{\"code\":\"Tid\",\"selection\":{\"filter\":\"item\",\"values\":[\"2020M01\",\"2021M01\"]}}],\"response\":{\"format\":\"json\"}}' -w '\\\\n---HTTP %{http_code}---\\\\n')",
+      "Bash(curl -sS -X OPTIONS 'https://api.scb.se/OV0104/v1/doris/sv/ssd/START/PR/PR0101/PR0101A/KPItotM' -H 'Origin: http://localhost:4200' -H 'Access-Control-Request-Method: POST' -H 'Access-Control-Request-Headers: content-type' -D - -o /dev/null)",
+      "Bash(curl -sS -X POST 'https://api.scb.se/OV0104/v1/doris/sv/ssd/START/PR/PR0101/PR0101A/KPItotM' -H 'Content-Type: text/plain' --data-raw '{\"query\":[{\"code\":\"ContentsCode\",\"selection\":{\"filter\":\"item\",\"values\":[\"000004VU\"]}},{\"code\":\"Tid\",\"selection\":{\"filter\":\"item\",\"values\":[\"2020M01\",\"2021M01\"]}}],\"response\":{\"format\":\"json\"}}' -w '\\\\n---HTTP %{http_code}---\\\\n')",
+      "Bash(curl -sS -X POST 'https://api.scb.se/OV0104/v1/doris/sv/ssd/START/PR/PR0101/PR0101A/KPItotM' -H 'Content-Type: text/plain' -H 'Origin: http://localhost:4200' -H 'Referer: http://localhost:4200/' --data-raw '{\"query\":[{\"code\":\"ContentsCode\",\"selection\":{\"filter\":\"item\",\"values\":[\"000004VU\"]}},{\"code\":\"Tid\",\"selection\":{\"filter\":\"item\",\"values\":[\"2020M01\",\"2021M01\"]}}],\"response\":{\"format\":\"json\"}}' -w '\\\\n---HTTP %{http_code}---\\\\n')",
+      "Bash(curl -sS -X POST 'https://api.scb.se/OV0104/v1/doris/sv/ssd/START/PR/PR0101/PR0101A/KPItotM' -H 'Content-Type: text/plain;charset=UTF-8' -H 'Origin: http://localhost:4200' --data-raw '{\"query\":[{\"code\":\"ContentsCode\",\"selection\":{\"filter\":\"item\",\"values\":[\"000004VU\"]}},{\"code\":\"Tid\",\"selection\":{\"filter\":\"item\",\"values\":[\"2020M01\",\"2021M01\"]}}],\"response\":{\"format\":\"json\"}}' -w '\\\\n---HTTP %{http_code}---\\\\n')",
+      "mcp__Claude_Preview__preview_start"
+    ]
+  }
+}
