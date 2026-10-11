@@ -13,6 +13,11 @@ import { registerLocaleData } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { lastValueFrom } from 'rxjs';
 
+const SCB_CPI_BASE_URL = 'https://api.scb.se/OV0104/v1/doris/sv/ssd/START/PR/PR0101/PR0101A';
+const CURRENT_CPI_START = moment('2026-01-01');
+const HISTORICAL_CPI = { url: `${SCB_CPI_BASE_URL}/KPI2020M1980`, contentsCode: '000007T9' };
+const CURRENT_CPI = { url: `${SCB_CPI_BASE_URL}/KPI2020M`, contentsCode: '00000808' };
+
 type Calculation = {
   amount: number;
   from: Moment;
@@ -54,11 +59,14 @@ export class AppComponent {
   }
 
   private async loadAvailableDateRange() {
-    const url = 'https://api.scb.se/OV0104/v1/doris/sv/ssd/START/PR/PR0101/PR0101A/KPItotM';
-    const metadata = await lastValueFrom(this.http.get(url)) as any;
-    const tid = metadata.variables.find((v: any) => v.code === 'Tid');
-    this.minDate = moment(tid.values.at(0), 'YYYY[M]MM');
-    this.maxDate = moment(tid.values.at(-1), 'YYYY[M]MM');
+    const [historicalMetadata, currentMetadata] = await Promise.all([
+      lastValueFrom(this.http.get(HISTORICAL_CPI.url)) as Promise<any>,
+      lastValueFrom(this.http.get(CURRENT_CPI.url)) as Promise<any>
+    ]);
+    const historicalTid = historicalMetadata.variables.find((v: any) => v.code === 'Tid');
+    const currentTid = currentMetadata.variables.find((v: any) => v.code === 'Tid');
+    this.minDate = moment(historicalTid.values.at(0), 'YYYY[M]MM');
+    this.maxDate = moment(currentTid.values.at(-1), 'YYYY[M]MM');
   }
 
   public openDatepicker(event: Event, datepickerRef: MatDatepicker<Moment>) {
@@ -112,9 +120,10 @@ export class AppComponent {
         result: Math.round(amount)
       };
     } else {
-      const response = await this.sendRequest(from, through);
-      const fromCpi = response.data.at(0).values.at(0) as number;
-      const throughCpi = response.data.at(1).values.at(0) as number;
+      const [fromCpi, throughCpi] = await Promise.all([
+        this.getCpi(from),
+        this.getCpi(through)
+      ]);
 
       this.calculation = {
         amount: amount,
@@ -134,8 +143,9 @@ export class AppComponent {
     }, 1);
   }
 
-  private async sendRequest(from: Moment, through: Moment) {
-    const url = 'https://api.scb.se/OV0104/v1/doris/sv/ssd/START/PR/PR0101/PR0101A/KPItotM';
+  private async getCpi(month: Moment) {
+    const source = month.isBefore(CURRENT_CPI_START, 'month') ? HISTORICAL_CPI : CURRENT_CPI;
+    const url = source.url;
     const body = {
       query: [
         {
@@ -143,7 +153,7 @@ export class AppComponent {
           selection: {
             filter: "item",
             values: [
-              "000004VU"
+              source.contentsCode
             ]
           }
         },
@@ -152,8 +162,7 @@ export class AppComponent {
           selection: {
             filter: "item",
             values: [
-              `${from.format('YYYY')}M${from.format('MM')}`,
-              `${through.format('YYYY')}M${through.format('MM')}`
+              month.format('YYYY[M]MM')
             ]
           }
         }
@@ -167,7 +176,7 @@ export class AppComponent {
     const request = this.http.post(url, JSON.stringify(body), { headers: headers });
     const response = await lastValueFrom(request) as any;
 
-    return response;
+    return Number(response.data.at(0).values.at(0));
   }
 
   private getResult(amount: number, from: Moment, fromCpi: number, through: Moment, throughCpi: number) {
