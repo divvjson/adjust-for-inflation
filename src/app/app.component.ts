@@ -129,7 +129,7 @@ export class AppComponent {
         amount: amount,
         from: from,
         through: through,
-        result: Math.round(this.getResult(amount, from, fromCpi, through, throughCpi))
+        result: Math.round(this.getResult(amount, fromCpi, throughCpi))
       };
     }
 
@@ -179,18 +179,8 @@ export class AppComponent {
     return Number(response.data.at(0).values.at(0));
   }
 
-  private getResult(amount: number, from: Moment, fromCpi: number, through: Moment, throughCpi: number) {
-    let result: number;
-
-    if (from < through) {
-      result = amount * (throughCpi / fromCpi);
-    } else if (from > through) {
-      result = amount * (fromCpi / throughCpi);
-    } else {
-      result = amount;
-    }
-
-    return result;
+  private getResult(amount: number, fromCpi: number, throughCpi: number) {
+    return amount * (throughCpi / fromCpi);
   }
 
   @HostListener('window:resize', ['$event'])
